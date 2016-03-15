@@ -1,9 +1,12 @@
 import java.io.*;
 import java.util.*;
-
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 class PCR {
 	public static void main(String[] args) {
-        
+        DateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        Date date1 = new Date();
+        System.out.println("program START at " + dateformat.format(date1));
         //read primer
         String fileName1 = args[0];
         
@@ -51,9 +54,11 @@ class PCR {
 		line = null;
 		
 		int readflag = 0;
-		String seq = "";
+		//String seq = "";
+		StringBuilder seq = new StringBuilder();
 		int findcount = 0;
 		int total = 0;
+		String tempSeq = "";
 		while(fileScanner2.hasNext()) {
 			line = fileScanner2.nextLine();
 			if(line.equals("")){continue;}
@@ -63,15 +68,17 @@ class PCR {
 					readflag = 1;
 					continue;
 				}else if(readflag == 1){
-					if(pcrRun (PrimerList,seq)){findcount++;};
-					seq = "";
+					tempSeq = seq.toString();
+					if(pcrRun (PrimerList,tempSeq)){findcount++;};
+					seq = new StringBuilder();
 				}
 			}else{
-				seq = seq + line;
+				seq.append(line);
 			}
 			
 			if(!fileScanner2.hasNext()){
-				if(pcrRun (PrimerList,seq)){findcount++;};
+				tempSeq = seq.toString();
+				if(pcrRun (PrimerList,tempSeq)){findcount++;};
 			}
 
 		}
@@ -82,6 +89,11 @@ class PCR {
         float percent = (float)findcount*100/(float)total;
         System.out.printf("%.2f",percent);
         System.out.println("% sequences are found");
+        
+        Date date2 = new Date();
+        long time = (date2.getTime() - date1.getTime())/1000;
+        System.out.println("program DONE in " + time + " secs");
+        System.out.println();
         
     }
     
