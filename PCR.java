@@ -56,6 +56,7 @@ class PCR {
 		int total = 0;
 		while(fileScanner2.hasNext()) {
 			line = fileScanner2.nextLine();
+			if(line.equals("")){continue;}
 			if(line.substring(0,1).equals(">")){
 				total++;
 				if(readflag == 0){
