@@ -20,14 +20,23 @@ class PCR {
 		String Split = ":";
 		while(fileScanner.hasNext()) {
 			line = fileScanner.nextLine();
-			String[] entry = line.split(Split);
-			String primer = entry[1].toUpperCase();
-			if(entry[0].equals("R")){
-				primer = complement(primer);
+			if(line.substring(0,1).equals(">")){
+				String[] entry = line.split(Split);
+				line = fileScanner.nextLine();
+				String primer = line.toUpperCase();
+				if(entry[0].equals(">F")){
+					PrimerList.add(primer);
+				}else if(entry[0].equals(">R")){
+					primer = complement(primer);
+					PrimerList.add(primer);
+				}else{
+					System.out.println("Direction need to be specified");
+				}
 			}
-			PrimerList.add(primer);
 		}
 		fileScanner.close();
+		
+		//System.out.println(PrimerList);
 
         //read seq and running PCR
         String fileName2 = args[1];
