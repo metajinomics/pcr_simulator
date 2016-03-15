@@ -7,9 +7,9 @@ class PCR {
         DateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date1 = new Date();
         System.out.println("program START at " + dateformat.format(date1));
+        
         //read primer
         String fileName1 = args[0];
-        
         Scanner fileScanner = null;
 		try {
 			fileScanner = new Scanner(new File(fileName1));
@@ -38,8 +38,6 @@ class PCR {
 			}
 		}
 		fileScanner.close();
-		
-		//System.out.println(PrimerList);
 
         //read seq and running PCR
         String fileName2 = args[1];
@@ -54,7 +52,6 @@ class PCR {
 		line = null;
 		
 		int readflag = 0;
-		//String seq = "";
 		StringBuilder seq = new StringBuilder();
 		int findcount = 0;
 		int total = 0;
