@@ -1,7 +1,7 @@
 import java.io.*;
 import java.util.*;
 
-class RemoveAlign {
+class remove_align {
 	public static void main(String[] args) {
         
         //read primer

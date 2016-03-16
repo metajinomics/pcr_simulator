@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-class PCR {
+class pcr {
 	public static void main(String[] args) {
         DateFormat dateformat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         Date date1 = new Date();
