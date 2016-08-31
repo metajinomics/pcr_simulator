@@ -72,7 +72,7 @@ def main():
     prim = open(sys.argv[1],'r')
     seqs = open(sys.argv[2],'r')
     pri = read_primer(prim)
-    
+    print sys.argv[1]
     #find product
     find_product(pri,seqs)
 
