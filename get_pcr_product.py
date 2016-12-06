@@ -1,80 +1,82 @@
+#!/usr/bin/python
+
 #this scrip gives pcr product from given primers 
 #usage: python get_pcr_product.py primers geneseq.fa
+#example: python get_pcr_product.py 16s.full.primers.txt eskape.16s.fa > pcr_product.fa
 
 import sys
 import reverse_complement
 import re
-def get_product(pri,se,name):
+
+def get_product(fpri,rpri,se,name):
     product = ''
     psize = 0
-    fpri = ''
-    rpri = ''
-    for x in pri.items():
-        if(x[0] in se):
-            temseq = se[se.find(x[0]):se.find(x[0])+400]
-            #print se.find(x[0])
-            for y in pri.items():
-                if(y[0] in temseq and y[0] != x[0]):
-                    psize = temseq.find(y[0])+len(y[0])
-                    product = temseq[:temseq.find(y[0])+len(y[0])]
-                    fpri = x[0]
-                    rpri = reverse_complement.get_rc(y[0])
-                    print fpri, rpri, psize, product, name
-    return fpri, rpri, psize, product
+    pfpri = ''
+    prpri = ''
+    for x in fpri.items():
+        ma = [m.start() for m in re.finditer(x[0], se)]
+        if len(ma) > 0:
+            for st in ma:
+                tempseq = se[st:st+400]
+                for y in rpri.items():
+                    rma = [m.start() for m in re.finditer(y[0],tempseq)]
+                    if len(rma) > 0 :
+                        for rst in rma:
+                            product = tempseq[:rst+len(y[0])]
+                            psize = len(product)
+                            pfpri = x[0]
+                            prpri = y[0]
+                            print ">%s %s(%s) %s(%s)\n%s" %(name, pfpri,fpri[pfpri], reverse_complement.get_rc(prpri),rpri[prpri], product)
+    return 0
 
-def find_product(pri,seqs):
+def find_product(fpri,rpri,seqs):
     name = ''
     flag = 0
     seq =[]
     for line in seqs:
         if(line[:1] == ">" and flag == 0):
-            name = line.strip()
+            name = line.strip()[1:]
             flag = 1
         elif(line[:1] == ">" and flag == 1):
             se = ''.join(seq)
-            get_product(pri,se,name)
-            name = line.strip()
+            get_product(fpri,rpri,se,name)
+            name = line.strip()[1:]
             seq = []
         else:
             seq.append(line.strip())
     se = ''.join(seq)
-    get_product(pri,se,name)
+    get_product(fpri,rpri,se,name)
         
 def read_primer(prim):
     swi = 0
-    pri = {} 
+    fpri = {}
+    rpri = {}
     name = ""
     for line in prim:
-        if(line[:2] == ">F"):
-            swi = 0
-            name = line.strip()[1:]
-        elif(line[:2] == ">R"):
-            swi = 1
+        if(line[:1] == ">"):
             name = line.strip()[1:]
         else:
-            if(swi == 0):
-                if not(pri.has_key(line.strip())):
-                    pri[line.strip()] = name
-                else:
-                    temp = pri[line.strip()] +','+name
-                    pri[line.strip()] = temp
+            seq = line.strip()
+            rseq = reverse_complement.get_rc(seq)
+            if fpri.has_key(seq):
+                temp = fpri[seq] + ','+name
+                fpri[seq] = temp
+                temp = rpri[rseq] + ',' +name
+                rpri[rseq] = temp
             else:
-                seq = reverse_complement.get_rc(line.strip())
-                if not(pri.has_key(seq)):
-                    pri[seq] = name
-                else:
-                    temp = pri[seq] +','+name
-                    pri[seq] =temp
-    return pri
+                fpri[seq] = name
+                rpri[rseq] = name
+
+    return fpri,rpri
             
 def main():
     #read primer
     prim = open(sys.argv[1],'r')
     seqs = open(sys.argv[2],'r')
-    pri = read_primer(prim)
-    print sys.argv[1]
+    fpri,rpri = read_primer(prim)
+
     #find product
-    find_product(pri,seqs)
+    find_product(fpri,rpri,seqs)
 
 if __name__ == '__main__':
     main()
