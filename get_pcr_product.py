@@ -26,7 +26,7 @@ def get_product(fpri,rpri,se,name):
                             psize = len(product)
                             pfpri = x[0]
                             prpri = y[0]
-                            print ">%s %s(%s) %s(%s) %s\n%s" %(name, pfpri,fpri[pfpri], reverse_complement.get_rc(prpri),rpri[prpri],len(product), product)
+                            print ">%s %s(%s) %s %s(%s) %s %s\n%s" %(name, pfpri,fpri[pfpri],st, reverse_complement.get_rc(prpri),rpri[prpri],st+rst+len(y[0]),len(product), product)
     return 0
 
 def find_product(fpri,rpri,seqs):
