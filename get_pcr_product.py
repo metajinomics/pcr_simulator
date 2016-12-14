@@ -77,7 +77,7 @@ def read_primer(file):
             
 def main():
     #read primer
-    prim = sys.argv[1])
+    prim = sys.argv[1]
     fpri,rpri = read_primer(prim)
 
     #find product
