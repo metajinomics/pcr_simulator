@@ -7,6 +7,7 @@
 import sys
 import reverse_complement
 import re
+import gzip
 
 def get_product(fpri,rpri,se,name):
     product = ''
@@ -29,7 +30,11 @@ def get_product(fpri,rpri,se,name):
                             print ">%s %s(%s) %s %s(%s) %s %s\n%s" %(name, pfpri,fpri[pfpri],st, reverse_complement.get_rc(prpri),rpri[prpri],st+rst+len(y[0]),len(product), product)
     return 0
 
-def find_product(fpri,rpri,seqs):
+def find_product(fpri,rpri,file):
+    if file[-2:] == 'gz':
+        seqs = gzip.open(file,'r')
+    else:
+        seqs = open(file,'r')
     name = ''
     flag = 0
     seq =[]
@@ -47,7 +52,8 @@ def find_product(fpri,rpri,seqs):
     se = ''.join(seq)
     get_product(fpri,rpri,se,name)
         
-def read_primer(prim):
+def read_primer(file):
+    prim = open(file,'r')
     swi = 0
     fpri = {}
     rpri = {}
@@ -66,16 +72,16 @@ def read_primer(prim):
             else:
                 fpri[seq] = name
                 rpri[rseq] = name
-
+    prim.close()
     return fpri,rpri
             
 def main():
     #read primer
-    prim = open(sys.argv[1],'r')
-    seqs = open(sys.argv[2],'r')
+    prim = sys.argv[1])
     fpri,rpri = read_primer(prim)
 
     #find product
+    seqs = sys.argv[2]
     find_product(fpri,rpri,seqs)
 
 if __name__ == '__main__':
