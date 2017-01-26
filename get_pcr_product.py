@@ -43,13 +43,13 @@ def find_product(fpri,rpri,file):
             name = line.strip()[1:]
             flag = 1
         elif(line[:1] == ">" and flag == 1):
-            se = ''.join(seq)
+            se = ''.join(seq).upper()
             get_product(fpri,rpri,se,name)
             name = line.strip()[1:]
             seq = []
         else:
             seq.append(line.strip())
-    se = ''.join(seq)
+    se = ''.join(seq).upper()
     get_product(fpri,rpri,se,name)
         
 def read_primer(file):
