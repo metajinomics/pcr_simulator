@@ -63,6 +63,9 @@ def read_primer(file):
             name = line.strip()[1:]
         else:
             seq = line.strip()
+            if seq == "":
+                continue
+            seq = seq.upper()
             rseq = reverse_complement.get_rc(seq)
             if fpri.has_key(seq):
                 temp = fpri[seq] + ','+name
