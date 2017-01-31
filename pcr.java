@@ -1,3 +1,4 @@
+//usage: java pcr primer.txt seq_file.fa
 import java.io.*;
 import java.util.*;
 import java.text.DateFormat;
@@ -10,35 +11,14 @@ class pcr {
         
         //read primer
         String fileName1 = args[0];
-        Scanner fileScanner = null;
-		try {
-			fileScanner = new Scanner(new File(fileName1));
-		} catch(FileNotFoundException e) {
-			System.err.println("Could not find file '" + fileName1 + "'.");
-			System.exit(1);
-		}//try
-		String line = null;
-		ArrayList <String> PrimerList = new ArrayList<String> ();
+		ArrayList <String> PrimerF = new ArrayList<String> ();
+		ArrayList <String> PrimerR = new ArrayList<String> ();
 		
-		String Split = ":";
-		while(fileScanner.hasNext()) {
-			line = fileScanner.nextLine();
-			if(line.substring(0,1).equals(">")){
-				String[] entry = line.split(Split);
-				line = fileScanner.nextLine();
-				String primer = line.toUpperCase();
-				if(entry[0].equals(">F")){
-					PrimerList.add(primer);
-				}else if(entry[0].equals(">R")){
-					primer = complement(primer);
-					PrimerList.add(primer);
-				}else{
-					System.out.println("Direction need to be specified");
-				}
-			}
-		}
-		fileScanner.close();
-
+		ArrayList <String> PrimerFcr = new ArrayList<String> ();
+		ArrayList <String> PrimerRcr = new ArrayList<String> ();
+		read_primer(fileName1,PrimerF,PrimerR,PrimerFcr,PrimerRcr);
+		//System.out.println(PrimerR);
+		
         //read seq and running PCR
         String fileName2 = args[1];
         Scanner fileScanner2 = null;
@@ -49,7 +29,7 @@ class pcr {
 			System.exit(1);
 		}//try
 		
-		line = null;
+		String line = null;
 		
 		int readflag = 0;
 		StringBuilder seq = new StringBuilder();
@@ -66,7 +46,7 @@ class pcr {
 					continue;
 				}else if(readflag == 1){
 					tempSeq = seq.toString();
-					if(pcrRun (PrimerList,tempSeq)){findcount++;};
+					if(pcrRun (PrimerF,PrimerR,PrimerFcr,PrimerRcr,tempSeq)){findcount++;};
 					seq = new StringBuilder();
 				}
 			}else{
@@ -75,7 +55,7 @@ class pcr {
 			
 			if(!fileScanner2.hasNext()){
 				tempSeq = seq.toString();
-				if(pcrRun (PrimerList,tempSeq)){findcount++;};
+				if(pcrRun (PrimerF,PrimerR,PrimerFcr,PrimerRcr,tempSeq)){findcount++;};
 			}
 
 		}
@@ -92,6 +72,37 @@ class pcr {
         System.out.println("program DONE in " + time + " secs");
         System.out.println();
         
+    }
+    
+    public static void read_primer (String fileName1,ArrayList <String> PrimerF,ArrayList <String> PrimerR,ArrayList <String> PrimerFcr,ArrayList <String> PrimerRcr) {
+    	Scanner fileScanner = null;
+    	try {
+			fileScanner = new Scanner(new File(fileName1));
+		} catch(FileNotFoundException e) {
+			System.err.println("Could not find file '" + fileName1 + "'.");
+			System.exit(1);
+		}//try
+		String line = null;
+		String Split = ":";
+		while(fileScanner.hasNext()) {
+			line = fileScanner.nextLine();
+			if(line.substring(0,1).equals(">")){
+				String[] entry = line.split(Split);
+				line = fileScanner.nextLine();
+				String primer = line.toUpperCase();
+				if(entry[0].equals(">F")){
+					PrimerF.add(primer);
+					PrimerFcr.add(complement(primer));
+				}else if(entry[0].equals(">R")){
+					PrimerRcr.add(primer);
+					primer = complement(primer);
+					PrimerR.add(primer);
+				}else{
+					System.out.println("Direction need to be specified");
+				}
+			}
+		}
+		fileScanner.close();
     }
     
     public static String complement (String primer) {
@@ -114,11 +125,11 @@ class pcr {
 		return String.valueOf(newchars);
 	} 
 	
-	public static boolean pcrRun (ArrayList <String> PrimerList,String contig) {
+	public static boolean pcrRun (ArrayList <String> PrimerF,ArrayList <String> PrimerR,ArrayList <String> PrimerFcr,ArrayList <String> PrimerRcr,String contig) {
     	boolean found = false;
-    	for(int i =0; i<PrimerList.size();i += 2){
+    	for(int i =0; i<PrimerF.size();i += 1){
     		int intIndex = 0;
-        	intIndex = contig.indexOf(PrimerList.get(i));
+        	intIndex = contig.indexOf(PrimerF.get(i));
         	if(intIndex == -1){continue;}
         	int contlength = 500;
         	int endlengh = intIndex+contlength;
@@ -127,10 +138,29 @@ class pcr {
         		endlengh = contig.length();
         	}
         	String Tempcontig = contig.substring(intIndex,endlengh);
-        	intIndex = Tempcontig.indexOf(PrimerList.get(i+1));
+        	for (int j=0; j<PrimerR.size();j++){
+        		intIndex = Tempcontig.indexOf(PrimerR.get(j));
+        		if(intIndex == -1){continue;}
+				found = true;
+			}
+		}
+		//this is for reverse complement
+		for(int i=0;i<PrimerRcr.size();i++){
+			int intIndex = 0;
+        	intIndex = contig.indexOf(PrimerRcr.get(i));
         	if(intIndex == -1){continue;}
-        	//Tempcontig = contig.substring(0,intIndex+PrimerList.get(1).length());
-			found = true;
+        	int contlength = 500;
+        	int endlengh = intIndex+contlength;
+        	
+        	if(endlengh > contig.length()){ 
+        		endlengh = contig.length();
+        	}
+        	String Tempcontig = contig.substring(intIndex,endlengh);
+        	for (int j=0; j<PrimerFcr.size();j++){
+        		intIndex = Tempcontig.indexOf(PrimerFcr.get(j));
+        		if(intIndex == -1){continue;}
+				found = true;
+			}
 		}
 		return found;
 	} 
