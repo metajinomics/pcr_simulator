@@ -21,8 +21,9 @@ def add_two(dict,bp1,bp2):
         temp2 = x[1][:]
         temp1.append(bp1)
         temp2.append(bp2)
+        le = len(dict)
         dict[x[0]] = temp1[:]
-        dict[len(dict)] = temp2[:]
+        dict[le] = temp2[:]
     return dict
 
 def add_three(dict,bp1,bp2,bp3):
@@ -35,9 +36,10 @@ def add_three(dict,bp1,bp2,bp3):
         temp1.append(bp1)
         temp2.append(bp2)
         temp3.append(bp3)
+        le = len(dict)
         dict[x[0]] = temp1[:]
-        dict[len(dict)] = temp2[:]
-        dict[len(dict)+1] = temp3[:]
+        dict[le] = temp2[:]
+        dict[le+1] = temp3[:]
     return dict
 
 def add_N(dict):
@@ -52,10 +54,11 @@ def add_N(dict):
         tempC.append("C")
         tempG.append("G")
         tempT.append("T")
+        le = len(dict)
         dict[x[0]] = tempA[:]
-        dict[len(dict)] = tempC[:]
-        dict[len(dict)+1] = tempG[:]
-        dict[len(dict)+2] = tempT[:]
+        dict[le] = tempC[:]
+        dict[le+1] = tempG[:]
+        dict[le+2] = tempT[:]
     return dict
 
 def main():
@@ -100,6 +103,7 @@ def main():
                 name = [ids,"_",str(x[0])]
                 print "".join(name)
                 print "".join(x[1])
+
                 
 if __name__ == '__main__':
     main()
